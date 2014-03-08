@@ -4,7 +4,9 @@ version := "0.15.7"
 
 organization := "com.foursquare"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.9.1"
+
+crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.2", "2.10.3")
 
 libraryDependencies <++= (scalaVersion) { scalaVersion =>
   val specsVersion = scalaVersion match {
@@ -16,6 +18,18 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
   val liftVersion = scalaVersion match {
     case _       => "2.5.1"
   }
+  def finagleName(n: String) = scalaVersion match {
+    case "2.9.1" => n
+    case _ => n + "_2.10"
+  }
+  val finagleVersion = scalaVersion match {
+    case "2.9.1" => "6.6.2"
+    case _ => "6.12.2"
+  }
+  val twttrCoreVersion = scalaVersion match {
+    case "2.9.1" => "6.5.0"
+    case _ => "6.12.1"
+  }
   Seq(
     "net.liftweb"             %% "lift-record" % liftVersion  % "compile",
     "org.mongodb"              % "mongo-java-driver"    % "[2.6.5,)"   % "compile",
@@ -26,9 +40,9 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
     "org.codehaus.jackson"     % "jackson-mapper-asl" % "1.8.8",
     "org.codehaus.jackson"     % "jackson-core-asl" % "1.8.8",
     "org.scalacheck" %% "scalacheck"         % scalaCheckVersion   % "test",
-    "com.twitter"             %% "finagle-core"         % "6.12.2" % "compile" exclude("thrift", "libthrift"),
-    "com.twitter"             %% "finagle-http"         % "6.12.2" % "compile" exclude("thrift", "libthrift"),
-    "com.twitter"             %% "util-core"            % "6.12.1" % "compile",
+    "com.twitter"              % finagleName("finagle-core") % finagleVersion % "compile" exclude("thrift", "libthrift"),
+    "com.twitter"              % finagleName("finagle-http") % finagleVersion % "compile" exclude("thrift", "libthrift"),
+    "com.twitter"              % finagleName("util-core") % twttrCoreVersion % "compile",
     "org.scalaj"              %% "scalaj-collection" % "1.5"
   )
 }
