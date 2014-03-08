@@ -4,9 +4,7 @@ version := "0.15.7"
 
 organization := "com.foursquare"
 
-scalaVersion := "2.9.1"
-
-crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.2")
+scalaVersion := "2.10.3"
 
 libraryDependencies <++= (scalaVersion) { scalaVersion =>
   val specsVersion = scalaVersion match {
@@ -28,9 +26,9 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
     "org.codehaus.jackson"     % "jackson-mapper-asl" % "1.8.8",
     "org.codehaus.jackson"     % "jackson-core-asl" % "1.8.8",
     "org.scalacheck" %% "scalacheck"         % scalaCheckVersion   % "test",
-    "com.twitter"              % "finagle-core"        % "5.3.23" % "compile" exclude("thrift", "libthrift"),
-    "com.twitter"              % "finagle-http"        % "5.3.23" % "compile" exclude("thrift", "libthrift"),
-    "com.twitter"              % "util-core"           % "5.3.14" % "compile",
+    "com.twitter"             %% "finagle-core"         % "6.12.2" % "compile" exclude("thrift", "libthrift"),
+    "com.twitter"             %% "finagle-http"         % "6.12.2" % "compile" exclude("thrift", "libthrift"),
+    "com.twitter"             %% "util-core"            % "6.12.1" % "compile",
     "org.scalaj"              %% "scalaj-collection" % "1.5"
   )
 }

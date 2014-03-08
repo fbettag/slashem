@@ -381,7 +381,7 @@ trait SolrMeta[T <: Record[T]] extends SlashemMeta[T] {
                                     rsr.response.start, joinedDocs, fallOf, min, facets)))
 
     } catch {
-      case e => Future.exception(new Exception("An error occured while parsing solr result \""+r+
+      case e: Throwable => Future.exception(new Exception("An error occured while parsing solr result \""+r+
                                                "\" from query ("+queryText+")",e))
     }
   }
@@ -996,7 +996,7 @@ trait SlashemField[V, M <: Record[M]] extends OwnedField[M] {
     try {
       Full(a.asInstanceOf[V])
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   //Support for highlighting matches
@@ -1051,7 +1051,7 @@ class SlashemIntListField[T <: Record[T]](owner: T) extends IntListField[T](owne
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   def contains(item: Int) = {
@@ -1077,7 +1077,7 @@ class SlashemStringListField[T <: Record[T]](owner: T) extends StringListField[T
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   def contains(item: String) = {
@@ -1103,7 +1103,7 @@ class SlashemLongListField[T <: Record[T]](owner: T) extends LongListField[T](ow
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   def contains(item: Long) = {
@@ -1218,7 +1218,7 @@ class ObjectIdField[T <: Record[T]](override val owner: T) extends Field[ObjectI
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
 
@@ -1250,7 +1250,7 @@ class JodaDateTimeField[T <: Record[T]](override val owner: T) extends DummyFiel
     try {
       Full(set(new DateTime(s)))
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   override def setFromAny(a: Any): Box[ValueType] ={
@@ -1286,7 +1286,7 @@ class IntListField[T <: Record[T]](override val owner: T) extends Field[List[Int
       case _ => Empty
     }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   override def setFromJValue(jv: net.liftweb.json.JsonAST.JValue) = Empty
@@ -1326,7 +1326,7 @@ class LongListField[T <: Record[T]](override val owner: T) extends Field[List[Lo
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   override def setFromJValue(jv: net.liftweb.json.JsonAST.JValue) = Empty
@@ -1364,7 +1364,7 @@ class ObjectIdListField[T <: Record[T]](override val owner: T) extends Field[Lis
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   def valueBoxFromAny(a: Any): Box[List[ObjectId]] = objectIdBoxFromAny(a)
@@ -1405,7 +1405,7 @@ class StringListField[T <: Record[T]](override val owner: T) extends Field[List[
         case _ => Empty
       }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   override def setFromJValue(jv: net.liftweb.json.JsonAST.JValue) = Empty
@@ -1451,7 +1451,7 @@ class PointField[T <: Record[T]](override val owner: T) extends Field[Pair[Doubl
       case _ => Empty
     }
     } catch {
-      case _ => Empty
+      case _: Throwable => Empty
     }
   }
   override def setFromJValue(jv: net.liftweb.json.JsonAST.JValue) = Empty
