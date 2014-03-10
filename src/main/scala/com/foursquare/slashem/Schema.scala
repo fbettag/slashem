@@ -501,8 +501,8 @@ trait SlashemSchema[M <: Record[M]] extends Record[M] {
                  fieldsToFetch=Nil, facetSettings=FacetSettings(facetFieldList=Nil,
                                                                 facetMinCount=None,
                                                                 facetLimit=None),
-                 customScoreScript=None, hls=None, hlFragSize=None, creator=None,
-                 comment=None, fallOf=None, min=None)
+                 customScoreScript=None, hls=None, pt=None, hlFragSize=None, creator=None,
+                 fallOf=None, min=None)
   }
   def query[Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, FC <: FacetCount, FLim, ST <: ScoreType](timeout: Duration, qb: QueryBuilder[M, Ord, Lim, MM, Y, H, Q, FC, FLim, ST]): SearchResults[M, Y]
   def queryFuture[Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, FC <: FacetCount, FLim, ST <: ScoreType](qb: QueryBuilder[M, Ord, Lim, MM, Y, H, Q, FC, FLim, ST]): Future[SearchResults[M, Y]]
@@ -865,12 +865,12 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
 
     val f = qb.filters.map({x => ("fq" -> x.extend)})
 
-    val ct = qb.comment match {
+    val ptq = qb.pt match {
       case None => Nil
-      case Some(a) => List("comment" -> a)
+      case Some(a) => List("sfield" -> a.field, "fq" -> "{!bbox}", "d" -> a.distance.toString, "pt" -> "%s,%s".format(a.lat, a.lng))
     }
 
-     ct ++ t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs
+     t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
   }
 
 
@@ -1132,7 +1132,6 @@ class SlashemObjectIdListField[T <: Record[T]](owner: T) extends ObjectIdListFie
 }
 
 
-
 class SlashemPointField[T <: Record[T]](owner: T) extends PointField[T](owner) with SlashemField[Pair[Double,Double], T] {
   def geoDistance(geolat: Double, geolng: Double) = {
     GeoDist(this.name,geolat,geolng)
@@ -1148,7 +1147,6 @@ class SlashemPointField[T <: Record[T]](owner: T) extends PointField[T](owner) w
   def recipSqeGeoDistance(geolat: Double, geolng: Double,x : Int, y: Int, z: Int) = {
     Recip(GeoDist(this.name,geolat,geolng,"square"),x,y,z)
   }
-
 }
 class SlashemBooleanField[T <: Record[T]](owner: T) extends BooleanField[T](owner) with SlashemField[Boolean, T]
 class SlashemDateTimeField[T <: Record[T]](owner: T) extends JodaDateTimeField[T](owner) with SlashemField[DateTime, T]
