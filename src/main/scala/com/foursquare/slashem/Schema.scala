@@ -875,7 +875,7 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
           "sfield" -> a.field,
           "d" -> a.distance.toString,
           "pt" -> "%s,%s".format(a.lat, a.lng))
-        if (!a.bbox) res else res ++ "fq" -> "{!bbox}"
+        if (!a.bbox) res else res ++ List("fq" -> "{!bbox}")
     }
 
      t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
