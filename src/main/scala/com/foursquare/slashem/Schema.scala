@@ -803,11 +803,6 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
     //The actual query
     val p = List(("q" -> qb.clauses.extend))
 
-    val s = qb.sort match {
-      case None => Nil
-      case Some(sort) => List("sort" -> (sort._1.boost + " " + sort._2))
-    }
-
     //The query type. Most likely edismax or dismax
     val qt = qb.queryType match {
       case None => Nil
@@ -845,11 +840,6 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
     qb.phraseBoostFields.filter(x => x.pf2).map({x => ("pf2" -> x.extend)})++
     qb.phraseBoostFields.filter(x => x.pf3).map({x => ("pf3" -> x.extend)})
 
-    val fl = qb.fieldsToFetch match {
-      case Nil => Nil
-      case x => List("fl" -> (x.mkString(",")))
-    }
-
     val t = qb.tieBreaker match {
       case None => Nil
       case Some(x) => List("tieBreaker" -> x.toString)
@@ -865,9 +855,27 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
 
     val f = qb.filters.map({x => ("fq" -> x.extend)})
 
+    val fl = (qb.pt, qb.fieldsToFetch) match {
+      case (Some(a), Nil) => List("fl" -> "*,_dist_:geodist()")
+      case (None, Nil) => Nil
+      case (Some(a), x) => List("fl" -> (x.filterNot(_ == "geodist()") ++ List("_dist_:geodist()") mkString(",")))
+      case (None, x) => List("fl" -> x.mkString(","))
+    }
+
+    val s = (qb.pt, qb.sort) match {
+      case (_, None) => Nil
+      case (None, Some(sort)) => List("sort" -> (sort._1.boost + " " + sort._2))
+      case (Some(a), Some(sort)) => List("sort" -> (sort._1.boost.replaceAll("_dist_", "geodist()") + " " + sort._2))
+    }
+
     val ptq = qb.pt match {
       case None => Nil
-      case Some(a) => List("sfield" -> a.field, "fq" -> "{!bbox}", "d" -> a.distance.toString, "pt" -> "%s,%s".format(a.lat, a.lng))
+      case Some(a) =>
+        val res = List(
+          "sfield" -> a.field,
+          "d" -> a.distance.toString,
+          "pt" -> "%s,%s".format(a.lat, a.lng))
+        if (!a.bbox) res else res ++ "fq" -> "{!bbox}"
     }
 
      t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq

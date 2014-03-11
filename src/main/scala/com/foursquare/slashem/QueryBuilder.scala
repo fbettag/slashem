@@ -38,7 +38,7 @@ abstract sealed class NoScoreModifiers extends ScoreType
 abstract sealed class ScoreScript extends ScoreType
 abstract sealed class NativeScoreScript extends ScoreType
 
-case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int)
+case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int, bbox: Boolean = false)
 case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int])
 
 case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, MinFacetCount <: FacetCount, FacetLimit, ST <: ScoreType](
@@ -226,8 +226,8 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
    * @param sfield Search field
    * @param distance Distance
    */
-  def geoQuery(lat: Double, lng: Double, sfield: String, distance: Int): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
-    this.copy(pt = Some(GeoQueryLocation(lat, lng, sfield, distance)))
+  def geoQuery(lat: Double, lng: Double, sfield: String, distance: Int, bbox: Boolean = false): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
+    this.copy(pt = Some(GeoQueryLocation(lat, lng, sfield, distance, bbox)))
   }
 
   // Right now we only support ordering by field
