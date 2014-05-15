@@ -1251,7 +1251,6 @@ class ObjectIdField[T <: Record[T]](override val owner: T) extends Field[ObjectI
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   override def valueBox() = e
 }
 class JodaDateTimeField[T <: Record[T]](override val owner: T) extends DummyField[DateTime, T](owner) {
@@ -1275,7 +1274,6 @@ class JodaDateTimeField[T <: Record[T]](override val owner: T) extends DummyFiel
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   override def valueBox() = e
 }
 
@@ -1312,7 +1310,6 @@ class IntListField[T <: Record[T]](override val owner: T) extends Field[List[Int
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   def value() = e getOrElse Nil
   override def valueBox() = e
 }
@@ -1352,7 +1349,6 @@ class LongListField[T <: Record[T]](override val owner: T) extends Field[List[Lo
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   def value() = e getOrElse Nil
   override def valueBox() = e
 }
@@ -1395,7 +1391,6 @@ class ObjectIdListField[T <: Record[T]](override val owner: T) extends Field[Lis
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   def value() = e getOrElse Nil
   override def valueBox() = e
 }
@@ -1431,7 +1426,6 @@ class StringListField[T <: Record[T]](override val owner: T) extends Field[List[
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   def value() = e getOrElse Nil
   override def valueBox() = e
 }
@@ -1477,7 +1471,6 @@ class PointField[T <: Record[T]](override val owner: T) extends Field[Pair[Doubl
   override def set(a: ValueType) = {e = Full(a)
                                     a.asInstanceOf[ValueType]}
   override def get() = e.get
-  override def is() = e.get
   def value() = e.get
   override def valueBox() = e
 }
@@ -1494,5 +1487,4 @@ class DummyField[V, T <: Record[T]](override val owner: T) extends Field[V, T] {
   override def toForm = Empty
   override def set(a: ValueType) = null.asInstanceOf[ValueType]
   override def get() = null.asInstanceOf[ValueType]
-  override def is() = null.asInstanceOf[ValueType]
 }

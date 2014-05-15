@@ -16,7 +16,7 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
     case _ => "1.10.1"
   }
   val liftVersion = scalaVersion match {
-    case _       => "2.5.1"
+    case _       => "3.0-SNAPSHOT"
   }
   def finagleName(n: String) = scalaVersion match {
     case "2.9.1" => n
@@ -59,7 +59,8 @@ resolvers ++= Seq(
   "Bryan J Swift Repository" at "http://repos.bryanjswift.com/maven2/",
   "twitter maven repo" at "http://maven.twttr.com/",
   "codehaus maven repo" at "http://repository.codehaus.org/",
-  "sonatype maven repo" at "http://oss.sonatype.org/content/repositories/releases/"
+  "sonatype maven repo" at "http://oss.sonatype.org/content/repositories/releases/",
+  "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 )
 
 
