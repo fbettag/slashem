@@ -4,9 +4,9 @@ version := "0.15.7"
 
 organization := "com.foursquare"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.2", "2.10.3")
+crossScalaVersions := Seq("2.10.4")
 
 libraryDependencies <++= (scalaVersion) { scalaVersion =>
   val specsVersion = scalaVersion match {
