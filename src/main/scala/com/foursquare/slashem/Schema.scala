@@ -500,7 +500,8 @@ trait SlashemSchema[M <: Record[M]] extends Record[M] {
                  tieBreaker=None, sort=None, minimumMatch=None ,queryType=None,
                  fieldsToFetch=Nil, facetSettings=FacetSettings(facetFieldList=Nil,
                                                                 facetMinCount=None,
-                                                                facetLimit=None),
+                                                                facetLimit=None,
+																facetQuery=None),
                  customScoreScript=None, hls=None, pt=None, hlFragSize=None, creator=None,
                  fallOf=None, min=None)
   }
@@ -855,6 +856,8 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
 
     val f = qb.filters.map({x => ("fq" -> x.extend)})
 
+	val facetq = qb.facetSettings.facetQuery.map(List("facet.query", _))
+
     val fl = (qb.pt, qb.fieldsToFetch) match {
       case (Some(a), Nil) => List("fl" -> "*,_dist_:geodist()")
       case (None, Nil) => Nil
@@ -878,7 +881,7 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
         if (!a.bbox) res else res ++ List("fq" -> "{!bbox}")
     }
 
-     t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
+     t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq ++ facetq
   }
 
 

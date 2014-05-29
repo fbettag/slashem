@@ -39,7 +39,7 @@ abstract sealed class ScoreScript extends ScoreType
 abstract sealed class NativeScoreScript extends ScoreType
 
 case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int, bbox: Boolean = false)
-case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int])
+case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int], facetQuery: Option[String])
 
 case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, MinFacetCount <: FacetCount, FacetLimit, ST <: ScoreType](
  meta: M with SlashemSchema[M],
@@ -187,6 +187,10 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
   /** Add a field based facet */
   def facetField[F](f: M => SlashemField[F,M]): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
     this.copy(facetSettings=facetSettings.copy(facetFieldList=Field(f(meta).name)::facetSettings.facetFieldList))
+  }
+
+  def facetQuery[F](q: String) = {
+	this.copy(facetSettings=facetSettings.copy(facetQuery=Some(q))
   }
 
   /** Set a minimum facet match count
