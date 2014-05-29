@@ -857,6 +857,7 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
     val f = qb.filters.map({x => ("fq" -> x.extend)})
 
 	val facetq = qb.facetSettings.facetQuery.flatMap(fq => List("facet.query" -> fq))
+	val facetm = List("facet.method" -> qb.facetSettings.facetMethod.toString)
 
     val fl = (qb.pt, qb.fieldsToFetch) match {
       case (Some(a), Nil) => List("fl" -> "*,_dist_:geodist()")
@@ -881,7 +882,7 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
         if (!a.bbox) res else res ++ List("fq" -> "{!bbox}")
     }
 
-     t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ facetq ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
+     t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ facetq ++ facetm ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
   }
 
 

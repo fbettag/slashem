@@ -38,8 +38,14 @@ abstract sealed class NoScoreModifiers extends ScoreType
 abstract sealed class ScoreScript extends ScoreType
 abstract sealed class NativeScoreScript extends ScoreType
 
+object FacetMethod extends Enumeration {
+	val Enum = Value("enum")
+	val Fc = Value("fc")
+	val Fcs = Value("fcs")
+}
+
 case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int, bbox: Boolean = false)
-case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int], facetQuery: List[String])
+case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int], facetQuery: List[String], facetMethod: FacetMethod.Value = FacetMethod.Enum)
 
 case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, MinFacetCount <: FacetCount, FacetLimit, ST <: ScoreType](
  meta: M with SlashemSchema[M],
@@ -189,9 +195,14 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
     this.copy(facetSettings=facetSettings.copy(facetFieldList=Field(f(meta).name)::facetSettings.facetFieldList))
   }
 
-  /** Add a field based facet */
+  /** Limit facets by query */
   def facetQuery[F](f: M => Clause[F]): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
 	this.copy(facetSettings=facetSettings.copy(facetQuery=f(meta).extend :: facetSettings.facetQuery))
+  }
+
+  /** SOLR faceting method, ENUM by default */
+  def facetMethod(method: FacetMethod.Value) = {
+	this.copy(facetSettings=facetSettings.copy(facetMethod = method))
   }
 
   /** Set a minimum facet match count
@@ -226,13 +237,13 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
   }
 
   /** A geo query with effects on sorting of the results.
+   * @param f Search field
    * @param lat Latitude
    * @param lng Longitude
-   * @param sfield Search field
    * @param distance Distance
    */
-  def geoQuery(lat: Double, lng: Double, sfield: String, distance: Int, bbox: Boolean = false): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
-    this.copy(pt = Some(GeoQueryLocation(lat, lng, sfield, distance, bbox)))
+  def geoQuery[F](f: M => SlashemField[F, M], lat: Double, lng: Double, distance: Int, bbox: Boolean = false): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
+    this.copy(pt = Some(GeoQueryLocation(lat, lng, f(meta).name, distance, bbox)))
   }
 
   // Right now we only support ordering by field
