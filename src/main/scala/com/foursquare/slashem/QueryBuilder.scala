@@ -190,7 +190,7 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
   }
 
   def facetQuery[F](q: String) = {
-	this.copy(facetSettings=facetSettings.copy(facetQuery=Some(q))
+	this.copy(facetSettings=facetSettings.copy(facetQuery=Some(q)))
   }
 
   /** Set a minimum facet match count
