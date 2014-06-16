@@ -44,7 +44,9 @@ object FacetMethod extends Enumeration {
 	val Fcs = Value("fcs")
 }
 
-case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int, bbox: Boolean = false)
+sealed trait GeoQueryTarget
+case class GeoQueryRegion(region: String, field: String) extends GeoQueryTarget
+case class GeoQueryLocation(lat: Double, lng: Double, field: String, distance: Int, bbox: Boolean = false) extends GeoQueryTarget
 case class FacetSettings(facetFieldList: List[Field], facetMinCount: Option[Int], facetLimit: Option[Int], facetQuery: List[String], facetMethod: FacetMethod.Value = FacetMethod.Enum)
 
 case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <: Highlighting, Q <: QualityFilter, MinFacetCount <: FacetCount, FacetLimit, ST <: ScoreType](
@@ -65,7 +67,7 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
  facetSettings: FacetSettings,
  customScoreScript: Option[(String, Map[String, Any])],
  hls: Option[String],
- pt: Option[GeoQueryLocation],
+ pt: Option[GeoQueryTarget],
  hlFragSize: Option[Int],
  creator: Option[(Pair[Map[String,Any],
                        Option[Map[String,ArrayList[String]]]]) => Y],
@@ -235,6 +237,15 @@ case class QueryBuilder[M <: Record[M], Ord, Lim, MM <: MinimumMatchType, Y, H <
   def tieBreaker(t: Double): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
     this.copy(tieBreaker=Some(t))
   }
+
+  /** A geo query with effects on sorting of the results.
+   * @param f Search field
+   * @param shape SOLR JTS shape
+   */
+  def geoQuery[F](f: M => SlashemField[F, M], shape: String): QueryBuilder[M, Ord, Lim, MM, Y, H, Q, MinFacetCount, FacetLimit, ST] = {
+    this.copy(pt = Some(GeoQueryRegion(shape, f(meta).name)))
+  }
+
 
   /** A geo query with effects on sorting of the results.
    * @param f Search field

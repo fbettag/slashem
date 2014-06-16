@@ -874,12 +874,14 @@ trait SolrSchema[M <: Record[M]] extends SlashemSchema[M] {
 
     val ptq = qb.pt match {
       case None => Nil
-      case Some(a) =>
+      case Some(a: GeoQueryLocation) =>
         val res = List(
           "sfield" -> a.field,
           "d" -> a.distance.toString,
           "pt" -> "%s,%s".format(a.lat, a.lng))
         if (!a.bbox) res else res ++ List("fq" -> "{!bbox}")
+      case Some(a: GeoQueryRegion) =>
+	  	List("fq" -> (a.field + ":" + a.region))
     }
 
      t ++ mm ++ qt ++ bq ++ qf ++ p ++ s ++ f ++ facetq ++ facetm ++ pf ++ fl ++ bf ++ hlp ++ ff ++ fs ++ ptq
