@@ -42,6 +42,7 @@ import org.elasticsearch.search.facet.terms.TermsFacetBuilder
 import org.elasticsearch.search.facet.terms.strings.InternalStringTermsFacet
 import org.elasticsearch.search.sort.{ScriptSortBuilder, SortOrder}
 import org.jboss.netty.util.CharsetUtil
+import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.jboss.netty.handler.codec.http.{DefaultHttpRequest, HttpResponseStatus, HttpHeaders, HttpMethod,
                                            HttpVersion, QueryStringEncoder, HttpRequest, HttpResponse}
 import org.joda.time.DateTime
@@ -387,7 +388,7 @@ trait SolrMeta[T <: Record[T]] extends SlashemMeta[T] {
   }
 
   def queryString(params: Seq[(String, String)]): QueryStringEncoder = {
-    val qse = new QueryStringEncoder(queryPath)
+    val qse = new QueryStringEncoder("")
     qse.addParam("wt", "json")
     params.foreach( x => {
       qse.addParam(x._1, x._2)
@@ -410,10 +411,14 @@ trait SolrMeta[T <: Record[T]] extends SlashemMeta[T] {
     val qse = queryString(params ++
                       logger.queryIdToken.map("magicLoggingToken" -> _).toList)
 
-    val request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, qse.toString)
+    val request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, queryPath)
     // Here be dragons! If you have multiple backends with shared IPs this could very well explode
     // but finagle doesn't seem to properly set the http host header for http/1.1
     request.addHeader(HttpHeaders.Names.HOST, servers.head)
+	request.addHeader(HttpHeaders.Names.CONTENT_TYPE, "application/x-www-form-urlencoded")
+	val bytes = qse.toString().replaceAll("^\\?", "").getBytes("UTF-8")
+	request.setContent(ChannelBuffers.wrappedBuffer(bytes))
+	request.addHeader(HttpHeaders.Names.CONTENT_LENGTH, bytes.length.toString())
     val loggedClient = logFilter andThen client
     (loggedClient(request)).map(response => {
       response.getStatus match {
