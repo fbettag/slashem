@@ -297,7 +297,7 @@ trait SolrMeta[T <: Record[T]] extends SlashemMeta[T] {
   def hostConnectionCoresize = 300
   def solrTcpConnectTimeout: Duration = 10.seconds
   def solrTimeout: Duration = 30.seconds
-
+  def solrKeepAlive: Boolean = true
   var myClient: Option[Service[HttpRequest,HttpResponse]] = None
 
   def client = {
@@ -313,6 +313,7 @@ trait SolrMeta[T <: Record[T]] extends SlashemMeta[T] {
             val p = h.last
             new InetSocketAddress(s, p.toInt)
           }))
+		  .keepAlive(solrKeepAlive)
           .hostConnectionLimit(hostConnectionLimit)
           .hostConnectionCoresize(hostConnectionCoresize)
           .retries(retries)
