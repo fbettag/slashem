@@ -1,6 +1,6 @@
 name := "slashem"
 
-version := "0.15.7-lift-2.6-RC2"
+version := "0.15.7-lift-2.6"
 
 organization := "com.foursquare"
 
@@ -14,7 +14,7 @@ libraryDependencies <++= (scalaVersion) { scalaVersion =>
     case _ => "1.10.1"
   }
   val liftVersion = scalaVersion match {
-    case _       => "2.6-M4"
+    case _       => "2.6"
   }
   def finagleName(n: String) = scalaVersion match {
     case "2.9.1" => n
